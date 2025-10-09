@@ -2,6 +2,7 @@ package com.abrar.store.controllers;
 
 import com.abrar.store.dtos.UserDto;
 import com.abrar.store.entities.User;
+import com.abrar.store.mappers.UserMapper;
 import com.abrar.store.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,12 +20,13 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     @GetMapping
     public List<UserDto> getAllUsers() {
         return userRepository.findAll()
                 .stream()
-                .map(user -> new UserDto(user.getId(), user.getName(), user.getEmail()))
+                .map(userMapper::userToUserDto)
                 .toList();
     }
 
@@ -34,8 +36,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        UserDto userDto =  new UserDto(user.getId(), user.getName(), user.getEmail());
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(userMapper.userToUserDto(user));
     }
 
 
