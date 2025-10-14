@@ -39,4 +39,20 @@ public class Cart {
                 .orElse(null);
     }
 
+    public CartItem addItem(Product product) {
+        CartItem cartItem = getItem(product.getId());
+
+        if (cartItem != null) {
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
+        }
+        else {
+            cartItem = new CartItem();
+            cartItem.setProduct(product);
+            cartItem.setQuantity(1);
+            cartItem.setCart(this);
+            items.add(cartItem);
+        }
+        return cartItem;
+    }
+
 }
