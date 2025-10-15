@@ -1,23 +1,18 @@
 package com.abrar.store.controllers;
 
-import com.abrar.store.dtos.ChangePasswordRequest;
-import com.abrar.store.dtos.RegisterUserRequest;
-import com.abrar.store.dtos.UpdateUserRequest;
-import com.abrar.store.dtos.UserDto;
+import com.abrar.store.dtos.*;
 import com.abrar.store.entities.User;
 import com.abrar.store.mappers.UserMapper;
 import com.abrar.store.repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +23,7 @@ import java.util.Map;
 public class UserController {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping
     public List<UserDto> getAllUsers() {
@@ -56,6 +52,7 @@ public class UserController {
         }
 
         User user = userMapper.toUser(request);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
         UserDto userDto = userMapper.userToUserDto(user);
         URI location = uriComponentsBuilder
@@ -102,5 +99,6 @@ public class UserController {
         userRepository.save(user);
         return ResponseEntity.noContent().build();
     }
+
 
 }
