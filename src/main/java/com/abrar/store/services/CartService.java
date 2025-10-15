@@ -3,6 +3,7 @@ package com.abrar.store.services;
 import com.abrar.store.dtos.AddItemToCartRequest;
 import com.abrar.store.dtos.CartDto;
 import com.abrar.store.dtos.CartItemDto;
+import com.abrar.store.dtos.UpdateCartItemRequest;
 import com.abrar.store.entities.Cart;
 import com.abrar.store.entities.CartItem;
 import com.abrar.store.entities.Product;
@@ -11,9 +12,11 @@ import com.abrar.store.exceptions.ProductNotFoundException;
 import com.abrar.store.mappers.CartMapper;
 import com.abrar.store.repositories.CartRepository;
 import com.abrar.store.repositories.ProductRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -28,12 +31,12 @@ public class CartService {
         return cartMapper.toDto(cart);
     }
 
-    public CartItemDto addToCart(UUID cartId, AddItemToCartRequest request) {
+    public CartItemDto addToCart(UUID cartId, Long productId) {
         Cart cart = cartRepository.findById(cartId).orElse(null);
         if (cart == null) {
             throw new CartNotFoundException();
         }
-        Product product = productRepository.findById(request.getProductId()).orElse(null);
+        Product product = productRepository.findById(productId).orElse(null);
         if (product == null) {
             throw new ProductNotFoundException();
         }
@@ -42,5 +45,47 @@ public class CartService {
         cartRepository.save(cart);
 
         return cartMapper.toDto(cartItem);
+    }
+
+    public CartDto getCart(UUID cartId) {
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+        if (cart == null) {
+            throw new CartNotFoundException();
+        }
+        return cartMapper.toDto(cart);
+    }
+
+    public CartItemDto updateCart(UUID cartId, Long productId, Integer quantity) {
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+        if (cart == null) {
+            throw new CartNotFoundException();
+        }
+
+        CartItem cartItem = cart.getItem(productId);
+        if (cartItem == null) {
+            throw new ProductNotFoundException();
+        }
+
+        cartItem.setQuantity(quantity);
+        cartRepository.save(cart);
+        return cartMapper.toDto(cartItem);
+    }
+
+    public void removeItem(UUID cartId, Long productId) {
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+        if (cart == null) {
+            throw new CartNotFoundException();
+        }
+        cart.removeItem(productId);
+        cartRepository.save(cart);
+    }
+
+    public void clearCart(UUID cartId) {
+        Cart cart = cartRepository.findById(cartId).orElse(null);
+        if (cart == null) {
+            throw new CartNotFoundException();
+        }
+        cart.clear();
+        cartRepository.save(cart);
     }
 }
