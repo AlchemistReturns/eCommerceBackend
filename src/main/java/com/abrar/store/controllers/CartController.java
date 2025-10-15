@@ -4,9 +4,6 @@ import com.abrar.store.dtos.AddItemToCartRequest;
 import com.abrar.store.dtos.CartDto;
 import com.abrar.store.dtos.CartItemDto;
 import com.abrar.store.dtos.UpdateCartItemRequest;
-import com.abrar.store.entities.Cart;
-import com.abrar.store.entities.CartItem;
-import com.abrar.store.entities.Product;
 import com.abrar.store.exceptions.CartNotFoundException;
 import com.abrar.store.exceptions.ProductNotFoundException;
 import com.abrar.store.mappers.CartMapper;
@@ -15,14 +12,12 @@ import com.abrar.store.repositories.ProductRepository;
 import com.abrar.store.services.CartService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.hibernate.sql.Update;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.service.annotation.DeleteExchange;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.awt.image.ReplicateScaleFilter;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.UUID;

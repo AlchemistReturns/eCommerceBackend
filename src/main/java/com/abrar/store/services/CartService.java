@@ -1,9 +1,7 @@
 package com.abrar.store.services;
 
-import com.abrar.store.dtos.AddItemToCartRequest;
 import com.abrar.store.dtos.CartDto;
 import com.abrar.store.dtos.CartItemDto;
-import com.abrar.store.dtos.UpdateCartItemRequest;
 import com.abrar.store.entities.Cart;
 import com.abrar.store.entities.CartItem;
 import com.abrar.store.entities.Product;
@@ -12,14 +10,14 @@ import com.abrar.store.exceptions.ProductNotFoundException;
 import com.abrar.store.mappers.CartMapper;
 import com.abrar.store.repositories.CartRepository;
 import com.abrar.store.repositories.ProductRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class CartService {
     private CartRepository cartRepository;
     private CartMapper cartMapper;
