@@ -10,6 +10,7 @@ import com.abrar.store.entities.Product;
 import com.abrar.store.mappers.CartMapper;
 import com.abrar.store.repositories.CartRepository;
 import com.abrar.store.repositories.ProductRepository;
+import com.abrar.store.services.CartService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.hibernate.sql.Update;
@@ -31,35 +32,19 @@ public class CartController {
     private final CartRepository cartRepository;
     private final CartMapper cartMapper;
     private final ProductRepository productRepository;
+    private final CartService cartService;
 
     @PostMapping
-    public ResponseEntity<CartDto> createCart(
-            UriComponentsBuilder uriBuilder
-    ) {
-        Cart cart = new Cart();
-        cartRepository.save(cart);
-        CartDto cartDto = cartMapper.toDto(cart);
+    public ResponseEntity<CartDto> createCart(UriComponentsBuilder uriBuilder) {
+        CartDto cartDto = cartService.createCart();
         URI uri = uriBuilder.path("/carts/{id}").buildAndExpand(cartDto.getId()).toUri();
-
         return ResponseEntity.created(uri).body(cartDto);
     }
 
     @PostMapping("/{cartId}/items")
     public ResponseEntity<CartItemDto> addToCart(@PathVariable(name = "cartId") UUID cartId,
                                                  @RequestBody AddItemToCartRequest request) {
-        Cart cart = cartRepository.findById(cartId).orElse(null);
-        if (cart == null) {
-            return ResponseEntity.notFound().build();
-        }
-        Product product = productRepository.findById(request.getProductId()).orElse(null);
-        if (product == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        CartItem cartItem = cart.addItem(product);
-        cartRepository.save(cart);
-
-        CartItemDto cartItemDto = cartMapper.toDto(cartItem);
+        CartItemDto cartItemDto = cartService.addToCart(cartId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(cartItemDto);
     }
 
