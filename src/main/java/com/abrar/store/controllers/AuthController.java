@@ -8,6 +8,7 @@ import com.abrar.store.entities.User;
 import com.abrar.store.mappers.UserMapper;
 import com.abrar.store.repositories.UserRepository;
 import com.abrar.store.services.JwtService;
+import io.jsonwebtoken.Jwt;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -49,10 +50,17 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(accessToken));
     }
 
-    @PostMapping("/validate")
-    public boolean validate(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        return jwtService.validateToken(token);
+    @PostMapping("/refresh")
+    public ResponseEntity<JwtResponse> refresh(@CookieValue(value = "refreshToken") String refreshToken) {
+        if(!jwtService.validateToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        var userId = jwtService.getUserIdFromToken(refreshToken);
+        User user = userRepository.findById(userId).orElseThrow();
+        var accessToken = jwtService.generateAccessToken(user);
+
+        return ResponseEntity.ok(new JwtResponse(accessToken));
     }
 
     @GetMapping("/me")
