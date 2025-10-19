@@ -1,6 +1,7 @@
 package com.abrar.store.controllers;
 
 import com.abrar.store.dtos.*;
+import com.abrar.store.entities.Role;
 import com.abrar.store.entities.User;
 import com.abrar.store.mappers.UserMapper;
 import com.abrar.store.repositories.UserRepository;
@@ -53,6 +54,7 @@ public class UserController {
 
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(Role.USER);
         user = userRepository.save(user);
         UserDto userDto = userMapper.userToUserDto(user);
         URI location = uriComponentsBuilder
