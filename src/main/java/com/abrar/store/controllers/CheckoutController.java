@@ -2,6 +2,7 @@ package com.abrar.store.controllers;
 
 import com.abrar.store.dtos.CheckoutRequest;
 import com.abrar.store.dtos.CheckoutResponse;
+import com.abrar.store.dtos.ErrorDto;
 import com.abrar.store.entities.Order;
 import com.abrar.store.entities.OrderItem;
 import com.abrar.store.entities.OrderStatus;
@@ -33,30 +34,17 @@ public class CheckoutController {
         var cart = cartRepository.findById(request.getCartId()).orElse(null);
         if (cart == null) {
             return ResponseEntity.badRequest().body(
-                    Map.of("error", "Cart not found")
+                new ErrorDto("Cart not found")
             );
         }
 
         if (cart.getItems().isEmpty()) {
             return ResponseEntity.badRequest().body(
-                    Map.of("error", "Cart is empty")
+                new ErrorDto("Cart is empty")
             );
         }
 
-        var order = new Order();
-        order.setTotalPrice(cart.getTotalPrice());
-        order.setStatus(OrderStatus.PENDING);
-        order.setCustomer(authService.getCurrentUser());
-
-        cart.getItems().forEach(item -> {
-            var orderItem = new OrderItem();
-            orderItem.setOrder(order);
-            orderItem.setProduct(item.getProduct());
-            orderItem.setQuantity(item.getQuantity());
-            orderItem.setTotalPrice(item.getTotalPrice());
-            orderItem.setUnitPrice(item.getProduct().getPrice() );
-            order.getItems().add(orderItem);
-        });
+        var order = Order.fromCart(cart, authService.getCurrentUser());
 
         orderRepository.save(order);
         cartService.clearCart(cart.getId());
