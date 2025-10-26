@@ -6,4 +6,4 @@ spring:
   jpa:
     show-sql: true
 
-websiteurl : http://localhost:8080
+websiteurl : http://localhost:4242
